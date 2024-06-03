@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+
+<content class="block max-w-3xl mx-auto my-12 px-6">
+  <div class="card p-8 !pb-10">
+<h1>Delete Account</h1>
+<p>Are you sure you want to delete your account?</p>
+
+<form method='POST'>
+    {% csrf_token %}
+    <div class="flex justify-center mt-4">
+            <button type="submit">Submit</button>
+            <a href="{{ request.META.HTTP_REFERER }}">Cancel</a>
+        </div>
+</form>
+
+    </div>
+</content>
+    
+{% endblock %}
+

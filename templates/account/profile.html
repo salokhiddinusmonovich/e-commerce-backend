@@ -1,10 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Profile {% endblock %}
+
+{% block content %}
+<section class="section-content padding-y">
+    <div id="profile" class="profile-section">
+        <div class="card-body">
+            <div class="card p-6">
+                <div class="text-center flex flex-col items-center">
+                    <img class="form-group" src="{{ profile.avatar }}" alt="Profile Avatar"/>
+                    <div class="card-title mb-4">@{{ profile.user.username }}</div>
+                    <div>
+                        <h1 class="form-group">{{ profile.name }}</h1>
+                        <div>
+                            <img src="https://img.icons8.com/material-outlined/50/000000/marker.png" alt="Location Icon">
+                            {% if profile.location %}
+                                {{ profile.location }}
+                            {% else %}
+                                Where do you live?
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if profile.bio %}
+                                {{ profile.bio }}
+                            {% else %}
+                                I am a person!😝
+                            {% endif %}
+                        </div>
+                        <div class="btn-default">
+                            <a href="{% url 'account:profile_delete' %}">Profile Delete</a>
+                        </div>
+                        <div>
+                            <a href="{% url 'account:profile_edit' %}">Profile Edit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+
+
+
+
+
