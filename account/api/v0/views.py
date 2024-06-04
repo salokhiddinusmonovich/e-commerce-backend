@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer, UserUpdateSerializers, UserChangePasswordSerializer
 from account.models import Profile
 from .renderers import UserRenderer
@@ -12,10 +12,11 @@ from .renderers import UserRenderer
 User = get_user_model()
 
 
-
 class SignUp(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
 
 class UserUpdateAPIView(UpdateAPIView):
     queryset = User.objects.all

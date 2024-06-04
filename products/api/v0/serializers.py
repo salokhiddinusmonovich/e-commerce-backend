@@ -32,20 +32,29 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ['pk', 'image']
 
 
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     images = serializers.SerializerMethodField()
+    comments = CommentCreateSerializer(many=True)
 
     class Meta:
         model = Product
-        fields = [
-            'pk', 'title', 'description', 'price', 'quantity', 'detail', 'images', 'category'
-        ]
+        exclude = ("detail", )
 
     def get_images(self, obj):
         images = Images.objects.filter(product=obj)
         serializers = ImageSerializer(images, many=True)
 
         return serializers.data
+
+
+
+
 
 
