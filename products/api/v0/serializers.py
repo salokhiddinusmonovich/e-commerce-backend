@@ -47,3 +47,5 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         serializers = ImageSerializer(images, many=True)
 
         return serializers.data
+
+
