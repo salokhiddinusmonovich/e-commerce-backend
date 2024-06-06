@@ -49,7 +49,6 @@ def sign_up(request):
 
     return render(request, 'account/register.html', context)
 
-
 def profile_view(request, username=None):
     if username:
         profile = get_object_or_404(User, username=username).profile

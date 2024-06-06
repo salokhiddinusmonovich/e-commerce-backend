@@ -36,7 +36,7 @@ class ImageSerializer(serializers.ModelSerializer):
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = ['text', 'star', 'product']
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)

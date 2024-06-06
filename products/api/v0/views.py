@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -34,19 +35,27 @@ class ProductByCategoryListAPIView(generics.ListAPIView):
         return qs
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('category'
+                                              ).prefetch_related('images_set').all()
     serializer_class = ProductDetailSerializer
-    authentication_classes = ()
-
-
-class CommentCreateView(APIView):
-    permission_classes = ()
-    def post(self, request):
-        comment = CommentCreateSerializer(data=request.data)
-        if comment.is_valid():
-            comment.save()
-        return Response({"message":"Successfully created!"}, status=status.HTTP_201_CREATED)
 
 
 
+# class CommentCreateView(APIView):
+#     permission_classes = ()
+#     def post(self, request):
+#         comment = CommentCreateSerializer(data=request.data)
+#         if comment.is_valid():
+#             comment.save()
+#         return Response({"message":"Successfully created!"}, status=status.HTTP_201_CREATED)
 
+
+
+
+class CommentCreateAPIView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentCreateSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
