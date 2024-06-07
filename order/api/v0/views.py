@@ -59,7 +59,7 @@ def add_order(request, pk):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_order(request, pk):
+def put_order(request, pk):
     product = get_object_or_404(Product, pk=pk)
     order, order_created = Order.objects.get_or_create(
         customer=request.user,
