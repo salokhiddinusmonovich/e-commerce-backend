@@ -1,11 +1,10 @@
 import os
+import json
 
 import pandas as pd
 from django.core.files import File
-
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from products.models import Product, Category, Images
-
 
 class Command(BaseCommand):
     help = "Closes the specified poll for voting"
@@ -21,13 +20,21 @@ class Command(BaseCommand):
         for index, row in df.iterrows():
             print(row['title'])
             category, created = Category.objects.get_or_create(name=row['category'])
+
+            # Attempt to parse the 'detail' field from JSON string to dictionary
+            try:
+                detail = json.loads(row['detail'])
+            except json.JSONDecodeError as e:
+                self.stderr.write(self.style.ERROR(f"Error decoding JSON in 'detail' field: {e}"))
+                continue
+
             product = Product.objects.create(
                 category=category,
                 title=row['title'],
                 description=row['description'],
                 price=row['price'],
                 quantity=row['quantity'],
-                detail=row['detail'],
+                detail=detail,  # Use parsed detail dictionary
             )
             for image_path in row['images'].split():
                 with open(image_path, 'rb') as img_file:
@@ -36,5 +43,5 @@ class Command(BaseCommand):
                     instance.save()
 
             self.stdout.write(
-                self.style.SUCCESS('Successfully')
+                self.style.SUCCESS(f'Successfully created product: {product.title}')
             )

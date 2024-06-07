@@ -55,3 +55,42 @@ def add_order(request, pk):
         order_item.set_total_price()
         return Response({'message': "1 ga oshirildi"}, status=status.HTTP_201_CREATED)
     return Response({'message': "order yaratildi"}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_order(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    order, order_created = Order.objects.get_or_create(
+        customer=request.user,
+        ordered=False
+    )
+
+    try:
+        order_item, order_item_created = OrderItem.objects.get_or_create(
+            product=product,
+            customer=request.user,
+            ordered=False,
+            order=order
+
+        )
+    except IntegrityError:
+        order_item, order_item_created = OrderItem.objects.get_or_create(
+            product=product,
+            customer=request.user,
+            quantity=1,
+            ordered=False,
+            order=order
+
+        )
+    order_item.set_total_price()
+    if order_item.quantity > 1:
+        order_item.quantity -= 1
+        order_item.save()
+        order_item.set_total_price()
+        return Response({'message': "1 ga kamaydi"}, status=status.HTTP_201_CREATED)
+    else:
+        order_item.delete()
+        return Response({'message': "order uchirildi"}, status=status.HTTP_201_CREATED)
+
+
