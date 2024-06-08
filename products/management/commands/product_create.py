@@ -21,7 +21,6 @@ class Command(BaseCommand):
             print(row['title'])
             category, created = Category.objects.get_or_create(name=row['category'])
 
-            # Attempt to parse the 'detail' field from JSON string to dictionary
             try:
                 detail = json.loads(row['detail'])
             except json.JSONDecodeError as e:
@@ -34,7 +33,7 @@ class Command(BaseCommand):
                 description=row['description'],
                 price=row['price'],
                 quantity=row['quantity'],
-                detail=detail,  # Use parsed detail dictionary
+                detail=detail,
             )
             for image_path in row['images'].split():
                 with open(image_path, 'rb') as img_file:

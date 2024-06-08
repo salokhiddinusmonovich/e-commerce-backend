@@ -25,7 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls')),
     path('', include('products.urls')),
-    path('order', include('order.urls'))
+    path('order', include('order.urls')),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]
 
 urlpatterns_api = [
