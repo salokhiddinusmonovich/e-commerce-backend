@@ -5,9 +5,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.core.cache import cache
+
 
 
 from products.models import Product
+from .permissions import IsOrderOwner
 from .serializers import OrderSerializer
 from order.models import Order, OrderItem
 
@@ -15,21 +18,32 @@ from order.models import Order, OrderItem
 class CartByOwnerListAPIView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(customer=self.request.user, ordered=False)
-        return qs
+        pk = self.request.user.pk
+        cardorederby = cache.get(f'cardorederby_{pk}')
+        if cardorederby is None:
+            cardorederby =  Order.objects.all()
+            cache.set('cardorederby_{pk}', cardorederby)
+        return cardorederby
+
+    # def get_queryset(self):
+    #     qs = super().get_queryset()
+    #     qs = qs.filter(customer=self.request.user, ordered=False)
+    #     return qs
+
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsOrderOwner])
 def add_order(request, pk):
     product = get_object_or_404(Product, pk=pk)
     order, order_created = Order.objects.get_or_create(
         customer=request.user,
         ordered=False
     )
+
 
     try:
         order_item, order_item_created = OrderItem.objects.get_or_create(
@@ -58,7 +72,7 @@ def add_order(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOrderOwner])
 def put_order(request, pk):
     product = get_object_or_404(Product, pk=pk)
     order, order_created = Order.objects.get_or_create(

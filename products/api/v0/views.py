@@ -1,6 +1,6 @@
 from django.db.models import Prefetch, OuterRef, Subquery
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.cache import cache
@@ -10,6 +10,7 @@ from ...models import Category, Product, Comment, Images
 
 class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         category_list = cache.get('category_list')
@@ -26,6 +27,7 @@ class CategoryListAPIView(generics.ListAPIView):
 class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
     def get_queryset(self):
@@ -49,6 +51,7 @@ class ProductListAPIView(generics.ListAPIView):
 
 class ProductByCategoryListAPIView(generics.ListAPIView):
     serializer_class = ProductSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         category_id = self.kwargs.get('pk')
@@ -77,13 +80,15 @@ class ProductByCategoryListAPIView(generics.ListAPIView):
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProductDetailSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
-        product_detail = cache.get('product_detail')
+        pk = self.kwargs.get('pk')
+        product_detail = cache.get(f'product_detail_{pk}')
         if product_detail is None:
             queryset = Product.objects.select_related('category'
                                                       ).prefetch_related('images_set').all()
-            cache.set('product_detail', queryset)
+            cache.set(f'product_detail_{pk}', queryset)
         return product_detail
 
 

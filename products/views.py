@@ -24,7 +24,7 @@ def home(request):
 
     products = products.annotate(
         main_image=Subquery(main_image_subquery)
-    ).values('pk', 'title', 'price', 'main_image')
+    ).values('pk', 'price', 'main_image')[:8] # title
 
     context = {
         'products': products,
@@ -91,30 +91,17 @@ def get_category(request, pk):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-
-
-    main_image_subquery = Images.objects.filter(
-        product=OuterRef('pk'),
-        # is_main=True
-    ).values('image')[:1]
-
-
-    product = Product.objects.filter(pk=pk).annotate(
-        main_image=Subquery(main_image_subquery)
-    ).first()
-
     if request.method == "POST":
         text = request.POST.get('text')
         star = request.POST.get('star')
         if request.user.is_authenticated:
-            Comment.objects.create(
+            comment = Comment.objects.create(
                 product=product,
                 owner=request.user,
                 text=text,
                 star=star if star else 0
             )
-            return redirect(reverse('product:detail', kwargs={"pk": product.pk}))
-
+            return redirect(reverse('product_detail', kwargs={"pk": product.pk}))
     avg_rating = product.comments.filter(star__gt=0).aggregate(Avg('star'))['star__avg']
     context = {"product": product, "star_avg": avg_rating}
     return render(request, 'product/product_detail.html', context)

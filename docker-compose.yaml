@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: web
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    env_file:
+      - .db.env
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+
+
+volumes:
+    pgdata:

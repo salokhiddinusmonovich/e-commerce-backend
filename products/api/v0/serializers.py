@@ -1,8 +1,10 @@
 from rest_framework import serializers
-
+from parler_rest.serializers import TranslatableModelSerializer, TranslatedFieldsField
 from products.models import Product, Category, Comment, Images
 
 class CategorySerializer(serializers.ModelSerializer):
+    translation = TranslatedFieldsField(shared_model=Category)
+
     class Meta:
         model = Category
         fields = ['pk', 'name', 'order', 'type']

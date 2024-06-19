@@ -14,6 +14,11 @@ from pathlib import Path
 
 from django.contrib import messages
 
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +32,7 @@ SECRET_KEY = 'django-insecure-0oqi@qjoru6d6q)+w4!3=hs!+bb)uy@2d=j@u^w0#&^g2^-4ip
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -44,12 +49,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'debug_toolbar',
+    'parler',
+    'parler_rest',
 
     # custom apps
     'base.apps.BaseConfig',
     'account.apps.AccountConfig',
     'products.apps.ProductsConfig',
     'order.apps.OrderConfig',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -98,6 +107,19 @@ DATABASES = {
 }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': config['NAME'],pip
+#         'USER': config['USER'],
+#         'PASSWORD': config['PASSWORD'],
+#         'HOST': config['HOST'],
+#         'PORT': config['PORT'],
+#     }
+# }
+
+
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -108,6 +130,13 @@ CACHES = {
     }
 }
 
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CElERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = 'Asia/Tashkent'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -166,6 +195,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'account.User'
 
 
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGES = (
+    ('uz', _("Uzbek")),
+    ('en', _("English")),
+    ('ru', _("Russian"))
+)
+
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'uz'},
+        {'code': 'en'},
+        {'code': 'ru'},
+    ),
+    'default': {
+        'fallback': 'uz',
+        'hide_untranslated': False
+    }
+}
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -183,3 +234,22 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+
+# settings.py
+
+# Celery settings
+result_backend = 'django-db'
+timezone = 'Asia/Tashkent'
+result_serializer = 'json'
+task_serializer = 'json'
+accept_content = ['application/json']
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'usmonovsalokhiddin@gmail.com'
+EMAIL_HOST_PASSWORD = 'pycogcxcxnlrylop'

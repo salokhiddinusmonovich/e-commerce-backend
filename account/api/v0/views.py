@@ -23,6 +23,8 @@ class UserUpdateAPIView(UpdateAPIView):
     serializer_class = UserUpdateSerializers
 
 
+
+
 class UserChangePasswordView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
